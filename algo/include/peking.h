@@ -846,5 +846,100 @@ namespace peking
 	}
 
 
+	int dfsgraphbalancingact(vector< vector< pair<int, int> > >& data, bool* visited, int index, int& pidx, int pindex)
+	{
+		visited[index] = true;
+		int count = 1;
+#ifdef DEBUG
+		//printf("N: %d\n",index);
+#endif
+		
+		for(unsigned int i = 0; i < data[index].size(); i++)
+		{
+			if(!visited[data[index][i].first])
+			{
+				int idx = -1;
+				int temp = dfsgraphbalancingact(data, visited, data[index][i].first, idx, index);
+				count += temp;
+				data[index][i].second = temp;
+				if(idx != -1)
+					data[data[index][i].first][idx].second = data.size() - temp;
+				
+			}
+			if(pindex != -1 && pindex == data[index][i].first)
+				pidx = i;
+		}
+		return count;
+	}
+
+	int dfsbalance(vector< vector< pair<int, int> > >& data, int& minbalance, bool* visited)
+	{
+		int numOfNodes = data.size();
+		int time = 0;
+		
+		std::memset(visited,0,sizeof(bool)*numOfNodes);
+
+		for(int i = 0;i<numOfNodes; i++)
+		{
+			if(!visited[i])
+			{
+				int pidx=0;
+				dfsgraphbalancingact(data, visited, i,pidx,-1);
+			}
+		}
+		
+		//std::memset(visited,0,sizeof(bool)*numOfNodes);
+
+		int globalmin = 10000000;
+		int globalindex = 0;
+		for(int index = 0;index<numOfNodes; index++)
+		{
+			int max = 0;
+			for(unsigned int i = 0; i < data[index].size(); i++)
+			{
+				if(data[index][i].second > max)
+					max = data[index][i].second;
+			}
+			if(max < globalmin)
+			{
+				globalmin = max;
+				globalindex = index;
+			}
+		}
+		minbalance = globalmin;
+		return globalindex;
+	}
+
+	void balancingact()
+	{
+		int testcases = 0;
+		cin>>testcases;
+		bool* visited = new bool[20000];
+		while(testcases--)
+		{
+			int numnodes = 0;
+			cin>>numnodes;
+			vector<vector < pair<int,int> > > graph;
+			for(int i = 0; i < numnodes; i++)
+			{
+				std::vector< std::pair<int, int> > temp;
+				graph.push_back(temp);
+			}
+			for(int i = 1; i < numnodes; i++)
+			{
+				int start = 0, end = 0;
+				cin>>start>>end;
+				std::pair<int, int> temp(end-1, 0);
+				graph[start-1].push_back(temp);
+				pair<int,int> temp2(start-1,0);
+				graph[end-1].push_back(temp2);
+			}
+			int minbalance = 0;
+			cout<<dfsbalance(graph,minbalance,visited)+1<<" ";
+			cout<<minbalance<<endl;
+		}
+	}
+
+
 
 };

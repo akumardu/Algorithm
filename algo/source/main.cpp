@@ -309,7 +309,7 @@ void create_all_Pallindromes()
 int main()
 {
 
-	peking::gcis();
+	peking::balancingact();
 	
 	std::getchar();
 	std::getchar();
