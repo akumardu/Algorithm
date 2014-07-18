@@ -3,6 +3,7 @@
 #include<map>
 #include<iostream>
 #include<stdio.h>
+#include<iomanip>
 
 namespace peking
 {
@@ -940,6 +941,97 @@ namespace peking
 		}
 	}
 
+	void verticalhistogram()
+	{
+		const int start = 65;
+		int numstrings = 4;
+		string input;
+		map<char,int> histogram;
+		for(int i = 0; i <26; i++)
+			histogram[i+start] = 0;
+		int maxCount = 0;
+		while(numstrings--)
+		{
+			getline(cin,input);
+			for(int i = 0; i < input.size(); i++)
+			{
+				if(input[i] >= start && input[i] <= start + 25)
+					histogram[input[i]]++;
+			}
+		}
+		for(int i = 0; i < 26; i++)
+		{
+			if(maxCount < histogram[i + start])
+				maxCount = histogram[i + start];
+		}
+		while(maxCount)
+		{
+			for(int i = 0; i < 26; i++)
+			{
+				if(histogram[i + start] == maxCount)
+				{
+					cout<<"*";
+					histogram[i + start]--;
+				}
+				else
+					cout<<" ";
+				cout<<" ";
+			}
+			cout<<endl;
+			maxCount--;
+		}
+		for(int i = 0; i < 26; i++)
+			cout<<char(i+start)<<" ";
+		cout<<endl;
+	}
 
+	void herdsums()
+	{
+		unsigned int i,j,n,ways=0;
+		long int remain;
+		scanf("%u", &n);
+
+		for (i=n; i!=0; --i) {
+			remain = n;
+			for (j=i; remain>0; --j)
+				remain -= j;
+			if (remain == 0)
+				++ways;
+		}
+
+		printf("%u\n", ways);
+	}
+
+	int reversenum(int input)
+	{
+		int result = 0;
+		while(input)
+		{
+			result = result*10 + input%10;
+			input = input/10;
+		}
+		return result;
+	}
+	void addreversenum()
+	{
+		int testcases;
+		cin>>testcases;
+		while(testcases--)
+		{
+			int a,b;
+			cin>>a>>b;
+			cout<<reversenum(reversenum(a) + reversenum(b))<<endl;
+		}
+	}
+
+	void ridetoschool()
+	{
+		int testcases = 1;
+		cin>>testcases;
+		while(testcases)
+		{
+			
+		}
+	}
 
 };
