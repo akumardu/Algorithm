@@ -309,7 +309,7 @@ void create_all_Pallindromes()
 int main()
 {
 
-	peking::powerfunc();
+	peking::swapprob();
 	
 	std::getchar();
 	std::getchar();

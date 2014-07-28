@@ -5,9 +5,248 @@
 #include<stdio.h>
 #include<iomanip>
 
+namespace hackerearth
+{
+	using namespace std;
+	typedef struct node
+	{   
+		int key;
+		node* prev;
+		node* next;
+	}node;
+
+	node* createNode(int x)
+	{
+		node *temp = new node;
+		temp->key = x;
+		temp->next = temp->prev = NULL;
+		return temp;
+	}
+
+	node* createList(node* head, int n)
+	{
+		int x;
+		node * last;
+		for(int i = 0; i<n ;i++)
+		{
+			cin>>x;
+			if(head == NULL)
+			{
+				head = createNode(x);
+				last = head;
+			}
+			else
+			{
+				last->next = createNode(x);
+				last->next->prev = last;
+				last = last->next;
+			}
+		}
+		return head;
+	}
+
+	void deleteNode(node* p)
+	{
+		p->next->prev = p->prev;
+
+		if(p->prev)
+			p->prev->next = p->next;
+	}
+
+	node* deleteFromBack(node *p, int cnt)
+	{
+		while(cnt)
+		{
+			p = p->prev;
+			cnt--;
+		}
+		p->next = NULL;
+
+		return p;
+	}
+
+	node* deleteList(node* head, int k, int n)
+	{
+		node* p1, *p2;
+		int cnt =k;
+
+		p1 = head;
+		p2 = p1->next;
+
+		while(p2 && cnt)
+		{
+			if((p1->key < p2->key) && p1)
+			{
+				deleteNode(p1);
+				if(p2->prev)
+					p1 = p2->prev;
+				else
+				{
+					p1 = p2;
+					p2 = p2->next;
+				}
+				cnt--;
+			}
+			else{
+				p1 = p2;
+				p2 = p2->next;
+			}
+		}
+
+		if(cnt )
+			p1 = deleteFromBack(p1, cnt);
+
+		while(p1 && p1->prev)
+			p1 = p1->prev;
+
+		return p1;
+	}
+
+	int removefriends()
+	{
+		int t, n, k, i;
+		node* head =NULL;
+		cin>>t;
+
+		while(t--){
+			cin>>n>>k;
+			head =NULL;
+			head= createList(head, n);
+
+			if(n==1)
+			{
+				cout<<head->key<<endl;
+				continue;
+			}
+
+			head  = deleteList(head, k, n);
+
+			while(head)
+			{
+				cout<<head->key<<" ";
+				head = head->next;
+			}
+			cout<<endl;
+		}
+
+		return 0;
+	}
+	
+	int hackb()
+	{
+		//cout << "Hello World!" << endl;
+		int test = 0;
+		cin>>test;
+
+		while(test--)
+		{
+			int sz = 0, k = 0;
+			cin>>sz;
+			cin>>k;
+			int c = k;
+			vector<int> num(sz,0);
+			for(int i = 0 ;i <sz; i++)
+			{
+				cin>>num[i];
+			}
+			while(k--)
+			{
+				bool deletelast = true;
+				vector<int>::iterator j = num.begin();
+				j++;
+				for(vector<int>::iterator i = num.begin(); i != num.end(); i++, j++)
+				{
+					if(j == num.end())
+						break;
+					if(*(i) < *(j))
+					{
+						i = num.erase(i);
+						deletelast = false;
+						break;
+					}
+				}
+				if(deletelast == true)
+				{
+					while(k)
+					{
+						j = num.end();
+						j--;
+						num.erase(j);
+						k--;
+					}
+				}
+			}
+			int count = 0;
+			for(int i = 0; i < num.size(); i++)
+			{
+				cout<<num[i]<<" ";
+			}
+			cout<<endl;
+		}
+		return 0;
+	}
+
+	int swapprob()
+	{
+		int t,n,i,k;
+		cin>>t;
+		while(t--){
+			cin>>n>>k;
+			int* a = new int[n];
+			for(i=0;i<n;i++)
+				cin>>a[i];
+			for(i=0;i<n;i++){
+				int pos=i;
+				for(int j=i+1;j<n;j++){
+					if((j-i)>k)
+						break;
+					if(a[j]<=a[pos])
+						pos=j;
+				}
+				for(int j=pos;j>i;j--)
+					a[j]=(a[j]+a[j-1])-(a[j-1]=a[j]);
+				k-=(pos-i);
+			}
+			for(i=0;i<n;i++)
+				cout<<a[i]<<" ";
+			cout<<endl;
+		}
+
+		return 0;
+	}
+
+};
+
 namespace peking
 {
 	using namespace std;
+
+	void minmax()
+	{
+		int testcases = 0;
+		cin>>testcases;
+		while(testcases--)
+		{
+			int num = 0;
+			cin>>num;
+			if((num %2) == 1)
+			{
+				cout<<num<<" "<<num<<endl;
+				continue;
+			}
+			else
+			{
+				int pow = 2;
+				while(num%pow == 0)
+				{
+					pow = pow * 2;
+				}
+				pow = pow/2;
+				cout<<num-pow+1<<" "<<num+pow-1<<endl;
+			}
+		}
+	}
+
 	void tritilling()
 	{
 		long* d = new long[31];
@@ -1024,13 +1263,366 @@ namespace peking
 		}
 	}
 
-	void ridetoschool()
+	void ridetoschool_amar()
 	{
 		int testcases = 1;
 		cin>>testcases;
 		while(testcases)
 		{
-			
+			double *speed = new double[testcases];
+			double *dist = new double[testcases];
+			int *starttime = new int[testcases];
+
+			int rider = -1;
+
+			for(int i = 0; i < testcases; i++)
+			{
+				cin>>speed[i]>>starttime[i];
+				speed[i] = (speed[i]*5)/18;
+				if(starttime[i] > 0)
+				{
+					dist[i] = 0;
+				}
+				else if(starttime[i] == 0)
+				{
+					if(rider == -1)
+					{
+						rider = i;
+					}
+					else if(speed[rider] < speed[i])
+					{
+						rider = i;
+					}
+					dist[i] = 0;
+				}
+				else
+				{
+					dist[i] = -1 * starttime[i] * speed[i];
+				}
+				
+			}
+			int time = 0;
+
+			while(true)
+			{
+				for(int i = 0; i < testcases; i++)
+				{
+					if(starttime[i] <= time)
+						dist[i] += speed[i];
+				}
+				for(int i = 0; i < testcases; i++)
+				{
+					if(rider == -1)
+					{
+						if(starttime[i] == time)
+						{
+							rider = i;
+						}
+					}
+					else
+					{
+						if(speed[rider] < speed[i] && dist[rider] <= dist[i] && dist[rider] >= (dist[i]-speed[i]))
+						{
+							rider = i;
+						}
+					}	
+				}
+				if(rider != -1 && dist[rider] >= 4500)
+				{
+					cout<<time+1<<endl;
+					//return;
+					break;
+				}
+				time++;
+			}
+			cin>>testcases;
+		}
+	}
+
+	void ridetoschool()
+	{
+		int N;//number of riders
+		int v,t;
+		int output;
+		double min;
+		double time;
+		while(1)
+		{
+			scanf("%d",&N); // input number of riders
+			if(N==0) // need to break in case of last test case otherwisw infinite loop
+				break;
+			min = 3600 * 4.5;  //this is the maximum time that a rider can takes assuming speed of 1km.hr
+			while(N--)
+			{
+				scanf("%d%d",&v,&t);//input velocity and set off time of each rider
+				if(t<0)//if rider sets off even before charley reached gates of Wanliu,then we do not    need to consider
+					continue;
+				time = 4.5 / v * 3600 + t; //calculate total time taken by this rider
+				if(time<min) //if it is minimum time,consider it
+					min=time;
+			}
+			t=(int)ceil(min);//print output for this test case as an integer
+			cout<<t<<endl;//print output in a new line
+		}
+		//return 0;
+	}
+
+	int formsvalidsquare(char** arr, int size, int x, int y)
+	{
+		int i = x-1, j = y-1;
+		int squaresize = 0;
+		while(i >= 0 && j >= 0)
+		{
+			if(arr[i][y] == 'J' && arr[i][j] == 'J' && arr[x][j] == 'J')
+			{
+				if(squaresize < x-i)
+					squaresize = x - i;
+			}
+			i--;
+			j--;
+		}
+		i = x-1;
+		j = y+1;
+		while(i >= 0 && j < size)
+		{
+			if(arr[i][y] == 'J' && arr[i][j] == 'J' && arr[x][j] == 'J')
+			{
+				if(squaresize < x-i)
+					squaresize = x - i;
+			}
+			i--;
+			j++;
+		}
+		i = x+1;
+		j = y+1;
+		while(i < size && j < size)
+		{
+			if(arr[i][y] == 'J' && arr[i][j] == 'J' && arr[x][j] == 'J')
+			{
+				if(squaresize < i - x)
+					squaresize = i - x;
+			}
+			i++;
+			j++;
+		}
+		i = x+1;
+		j = y-1;
+		while(i < size && j >= 0)
+		{
+			if(arr[i][y] == 'J' && arr[i][j] == 'J' && arr[x][j] == 'J')
+			{
+				if(squaresize < i - x)
+					squaresize = i - x;
+			}
+			i++;
+			j--;
+		}
+		return squaresize;
+	}
+
+	void bigsquare()
+	{
+		int size = 0;
+		cin>>size;
+		char ** arr = new char*[size];
+		for(int i = 0; i < size; i++)
+		{
+			arr[i] = new char[size];
+			for(int j = 0; j < size; j++)
+			{
+				cin>>arr[i][j];
+			}
+		}
+		int maxsquare = 0;
+		for(int i = 0; i < size; i++)
+		{
+			for(int j = 0; j < size; j++)
+			{
+				if(arr[i][j] == 'B')
+					continue;
+				int tempsquare = formsvalidsquare(arr,size,i,j); 
+				if(maxsquare < tempsquare)
+				{
+					maxsquare = tempsquare;
+				}
+			}
+		}
+		cout<<maxsquare*maxsquare<<endl;
+	}
+
+	#define PI 3.141592653589793
+	void yeehaw()
+	{
+		int testcases;
+		cin>>testcases;
+		int i = 0;
+		while(testcases--)
+		{
+			i++;
+			int n = 0;
+			double R = 0;
+			cin>>R>>n;
+			double r = (R * sin(PI/n))/(1 + sin(PI/n));
+			printf("Scenario #%d:\n",i);
+			printf("%.3f\n",r);
+		}
+	}
+
+	bool binarysearchforgoldbach(vector<int> & primes, int num)
+	{
+		int low = 0, high = primes.size() -1;
+		while(low <= high)
+		{
+			int mid = low + (high - low)/2;
+			if(primes[mid] == num)
+				return true;
+			else if(primes[mid] < num)
+			{
+				low = mid + 1;
+			}
+			else
+			{
+				high = mid - 1 ;
+			}
+		}
+		return false;
+	}
+
+	void goldbach()
+	{
+		int n = 1000000;
+		vector<int> primes;
+		bool* ok = new bool[n];
+		std::memset(ok,0,n*sizeof(bool));
+        for (int i = 2; i < n; ++i) // primes up to 1000000 (only need up to sqrt of 1 000 000 actually)
+        {
+            if (!ok[i])
+            {
+                primes.push_back(i);
+
+                for (long long j = i; j < n; j += i)
+                    ok[j] = true;
+            }
+        }
+		int testcases;
+		cin>>testcases;
+		while(testcases)
+		{
+			for(int i = 0; i < primes.size(); i++)
+			{
+				if(binarysearchforgoldbach(primes,testcases - primes[i]))
+				{
+					cout<<testcases<<" = "<<primes[i]<<" + "<<testcases - primes[i]<<endl;
+					break;
+				}
+			}
+			cin>>testcases;
+		}
+	}
+
+	void circumference()
+	{
+		double x1,y1,x2,y2,x3,y3;
+		while(cin>>x1>>y1>>x2>>y2>>x3>>y3)
+		{
+			double a=sqrt((x1-x2)*(x1-x2)+(y1-y2)*(y1-y2));  
+			double b=sqrt((x1-x3)*(x1-x3)+(y1-y3)*(y1-y3));  
+			double c=sqrt((x2-x3)*(x2-x3)+(y2-y3)*(y2-y3));  
+			double s=(a+b+c)/2.0;  
+  
+			double r=a*b*c/(4*sqrt(s*(s-a)*(s-b)*(s-c)));  
+
+			printf("%.2f\n",2*r*PI);
+		}
+	}
+
+	struct point
+	{
+		int x;
+		int y;
+	};
+	double area(vector<point>& points)
+	{
+		int s1 = 0, s2 = 0;
+		for(int i = 0; i < points.size()-1; i++)
+		{
+			s1 += points[i].x*points[i+1].y;
+			s2 += points[i].y*points[i+1].x;
+		}
+		s1 += points[points.size() -1].x * points[0].y;
+		s2 += points[points.size() -1].y*points[0].x;
+		double area = abs(s1-s2)/2.0;
+		return area;
+	}
+	void area(point& pointa, point pointb, int& s1, int& s2)
+	{
+		s1 += pointa.x*pointb.y;
+		s2 += pointa.y*pointb.x;
+	}
+	void polygonarea()
+	{
+		int testcases;
+		cin>>testcases;
+		while(testcases--)
+		{
+			string input;
+			cin>>input;
+			point startpoint;
+			startpoint.x = 0;
+			startpoint.y = 0;
+			//vector<point> points;
+			//points.push_back(startpoint);
+			point prevpoint = startpoint;
+			int s1 = 0, s2 = 0;
+			for(int i = 0; i < input.size(); i++)
+			{
+				point nextpoint;
+				nextpoint.x = 0;
+				nextpoint.y = 0;
+				switch(input[i])
+				{
+				case '8':
+					nextpoint.x = prevpoint.x;
+					nextpoint.y = prevpoint.y + 1;
+					break;
+				case '2':
+					nextpoint.x = prevpoint.x;
+					nextpoint.y = prevpoint.y - 1;
+					break;
+				case '6':
+					nextpoint.x = prevpoint.x+1;
+					nextpoint.y = prevpoint.y;
+					break;
+				case '4':
+					nextpoint.x = prevpoint.x - 1;
+					nextpoint.y = prevpoint.y;
+					break;
+				case '1':
+					nextpoint.x = prevpoint.x - 1;
+					nextpoint.y = prevpoint.y - 1;
+					break;
+				case '3':
+					nextpoint.x = prevpoint.x + 1;
+					nextpoint.y = prevpoint.y - 1;
+					break;
+				case '7':
+					nextpoint.x = prevpoint.x - 1;
+					nextpoint.y = prevpoint.y + 1;
+					break;
+				case '9':
+					nextpoint.x = prevpoint.x + 1;
+					nextpoint.y = prevpoint.y + 1;
+					break;
+				default:
+					break;
+				};
+				//points.push_back(nextpoint);
+				area(prevpoint,nextpoint,s1,s2);
+				prevpoint = nextpoint;
+			}
+			area(prevpoint,startpoint,s1,s2);
+			double area = abs(s1-s2)/2.0;
+			cout<<area<<endl;
 		}
 	}
 
