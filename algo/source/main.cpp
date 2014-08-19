@@ -1,6 +1,5 @@
 
 #include<iostream>
-
 #include "bst.h"
 #include<cstdlib>
 #include "time.h"
@@ -31,6 +30,8 @@
 #include "msiv.h"
 #include "topcoder.h"
 #include "peking.h"
+#include "compprogprac.h"
+#include "amazonprep.h"
 
 typedef unsigned long long int big;
 
@@ -308,8 +309,7 @@ void create_all_Pallindromes()
 
 int main()
 {
-
-	peking::swapprob();
+	amazonprep::testprogram_1();
 	
 	std::getchar();
 	std::getchar();

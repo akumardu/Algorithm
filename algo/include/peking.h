@@ -5,6 +5,7 @@
 #include<stdio.h>
 #include<iomanip>
 
+
 namespace hackerearth
 {
 	using namespace std;
@@ -220,6 +221,212 @@ namespace hackerearth
 namespace peking
 {
 	using namespace std;
+
+	int tempInversion()
+	{
+
+		int  N, m; 
+		int  P, temp, i; 
+		while (scanf ( "%d%d" , &N, &m)  &&  N > 0 ) 
+		{         
+			P = 1 ; 
+			while ((P * (P - 1 )) / 2 < m) P++ ;         
+			temp = (P * (P - 1 )) / 2 ; 
+			for (i = 1 ; i <= N - P; i ++ )             
+				printf ( "%d " , i);         
+			printf ( "%d " , N - temp + m); 
+			for (i = N; i >= N - P + 1 ; i--) 
+			{ 
+				if (i != N - temp + m)
+					printf ( "%d " , i);         
+			}
+
+			printf ( "\n" );     
+		}
+
+		return  0 ; 
+	}
+	int count_Inversions(int* arr, int sz)
+	{
+		int count = 0;
+		for(int i = 0; i < sz; i++)
+		{
+			for(int j = i+1; j < sz; j++)
+			{
+				if(arr[i] > arr[j])
+					count++;
+			}
+		}
+		return count;
+	}
+	void nextInversion()
+	{
+		int n;
+		long m;
+		cin>>n>>m;
+		int* vect = new int[50000];
+		while(n != -1)
+		{
+			for(int i = 0; i < n; i++)
+				vect[i] = i+1;
+			
+			do {
+				std::next_permutation(vect,vect+n);
+			} while ( count_Inversions(vect,n) < m );
+			for(int i = 0; i < n; i++)
+				cout<<vect[i]<<" ";
+			cout<<endl;
+			cin>>n>>m;
+		}
+	}
+	void swapper(int* vect, int& end, int maxn, int& start, int swap)
+	{
+		if(swap)
+		{
+			for(int i = end, j = end - maxn; i>j; i--,j++)
+			{
+				int temp = vect[i];
+				vect[i] = vect[j];
+				vect[j] = temp;
+			}
+			start = end - maxn;
+		}
+		else
+		{
+			for(int i = start, j = start + maxn; i<j; i++,j--)
+			{
+				int temp = vect[i];
+				vect[i] = vect[j];
+				vect[j] = temp;
+			}
+			end = start + maxn;
+		}
+	}
+	void anotherNextInversion()
+	{
+		long n;
+		long m;
+		cin>>n>>m;
+		long inv = m;
+		int* vect = new int[50000];
+		while(n != -1)
+		{
+			for(int i = 0; i < n; i++)
+				vect[i] = i+1;
+			int swap = 1;
+			int start = 0;
+			int end = n-1;
+			while(m)
+			{
+				int maxn = 1;
+				while((maxn*(maxn+1))/2 < m)
+					maxn++;
+				if(swap)
+					swapper(vect,end,maxn,start,swap);
+				else
+					swapper(vect,end,m,start,swap);
+
+				if(swap)
+					m = (maxn*(maxn+1))/2 - m;
+				else
+				{
+					m = (m*(m+1)/2) - m;
+				}
+				swap = !swap;
+			}
+			//cout<<count_Inversions(vect,n)<<endl;
+			for(int i = 0; i < n; i++)
+				cout<<vect[i]<<" ";
+			cout<<endl;
+			cin>>n>>m;
+			inv = m;
+		}
+	}
+
+	void gameofconnections()
+	{
+		long long arc[201];
+		arc[0] = 1;
+		arc[1] = 0;
+		arc[2] = 1;
+		for(int i = 3; i < 201; i++)
+		{
+			if(i%2 == 1)
+			{
+				arc[i] = 0;
+				continue;
+			}
+			long long sum = 0;
+			for(int j = 0; j < i-1; j++)
+			{
+				sum += arc[j] * arc[i - j - 2];
+			}
+			arc[i] = sum;
+		}
+		int num;
+		cin>>num;
+		while(num != -1)
+		{
+			cout<<arc[num*2]<<endl;
+			cin>>num;
+		}
+	}
+
+	bool insideCircle(double cx, double cy, double r, double x, double y)
+	{
+		if((cx-x)*(cx-x) + (cy-y)*(cy-y) - r*r > 1e-6)
+			return false;
+		else
+			return true;
+	}
+	
+	void chocolatechipcookies()
+	{
+		vector<double> x;
+		vector<double> y;
+		double tempx, tempy;
+		int c = 0;
+		while(c++ < 8)
+		{
+			cin>>tempx>>tempy;
+			x.push_back(tempx);
+			y.push_back(tempy);
+		}
+
+		int max = 0;
+		for(int i = 0; i < x.size(); i++)
+		{
+			for(int j = i+1; j<x.size(); j++)
+			{
+				double q = sqrt((x[i] - x[j])*(x[i] - x[j]) + (y[i] - y[j])*(y[i] - y[j]) );
+				if(2.5*2.5 - q*q/4 < 1e-6)
+					continue;
+				double cx = (x[i] + x[j])/2 + sqrt(2.5*2.5 - q*q/4 + 1e-6)*(y[i]-y[j])/q;
+				double cy = (y[i] + y[j])/2 + sqrt(2.5*2.5 - q*q/4 + 1e-6)*(x[j]-x[i])/q;
+				int count = 0;
+				for(int k = 0; k < x.size(); k++)
+				{
+					if(insideCircle(cx,cy,2.5,x[k],y[k]))
+						count++;
+				}
+				//cout<<x[i]<<":"<<y[i]<<":"<<x[j]<<":"<<y[j]<<":"<<count<<endl;
+				if(max < count)
+					max = count;
+				cx = (x[i] + x[j])/2 - sqrt(2.5*2.5 - q*q/4 + 1e-6)*(y[i]-y[j])/q;
+				cy = (y[i] + y[j])/2 - sqrt(2.5*2.5 - q*q/4 + 1e-6)*(x[j]-x[i])/q;
+				count = 0;
+				for(int k = 0; k < x.size(); k++)
+				{
+					if(insideCircle(cx,cy,2.5,x[k],y[k]))
+						count++;
+				}
+				//cout<<x[i]<<":"<<y[i]<<":"<<x[j]<<":"<<y[j]<<":"<<count<<endl;
+				if(max < count)
+					max = count;
+			}
+		}
+		cout<<max<<endl;
+	}
 
 	void minmax()
 	{

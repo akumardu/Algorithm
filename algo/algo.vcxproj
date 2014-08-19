@@ -27,9 +27,11 @@
   <ItemGroup>
     <ClInclude Include="include\algo4iv.h" />
     <ClInclude Include="include\algo_part2.h" />
+    <ClInclude Include="include\amazonprep.h" />
     <ClInclude Include="include\bst.h" />
     <ClInclude Include="include\cc_gfg.h" />
     <ClInclude Include="include\codechef.h" />
+    <ClInclude Include="include\compprogprac.h" />
     <ClInclude Include="include\fb.h" />
     <ClInclude Include="include\geeksforgeeks.h" />
     <ClInclude Include="include\glasses.h" />
