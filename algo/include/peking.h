@@ -4,7 +4,120 @@
 #include<iostream>
 #include<stdio.h>
 #include<iomanip>
+#include<stack>
+#include<queue>
+#include<limits.h>
+#include<sstream>
 
+namespace BinarySearchHeapConstruction
+{
+	using namespace std;
+	struct node
+	{
+		string label;
+		int data;
+	};
+	class labelComparator
+	{
+	public :
+		bool operator()(const node& a, const node& b)
+		{
+			if(a.label.compare(b.label) < 0)
+				return true;
+			else return false;
+		}
+	};
+	struct stackinput
+	{
+		int start;
+		int end;
+		int index;
+	};
+	void binarysearchheap()
+	{
+		int n;
+		scanf("%d",&n);
+		while(n)
+		{
+			vector<node> nodes;
+			char temp[256];
+			int data;
+			
+			for(int i = 0; i < n; i++)
+			{
+				node tempnode;
+				scanf("%[^/]s",&temp);
+				scanf("/%d",&data);
+				tempnode.label = temp+1;
+				tempnode.data = data;
+				nodes.push_back(tempnode);
+			}
+			sort(nodes.begin(), nodes.end(), labelComparator());
+			stack<stackinput> stk;
+			string result;
+			stackinput s;
+			s.start = 0;
+			s.end = n-1;
+			s.index = 0;
+			stk.push(s);
+			while(!stk.empty())
+			{
+				s = stk.top();
+				stk.pop();
+				if(s.start > s.end)
+					continue;
+				int max = -1;
+				int maxindex = -1;
+				for(int i = s.start; i <= s.end; i++)
+				{
+					if(max < nodes[i].data)
+					{
+						max = nodes[i].data;
+						maxindex = i;
+					}
+				}
+				int rsize = 0;
+				if(result.size() == 0)
+				{
+					char tempa[256];
+					//ostringstream temp;  //temp as in temporary
+					//temp<<nodes[maxindex].data;
+					itoa(nodes[maxindex].data,tempa,10);
+					result = result + "(" + nodes[maxindex].label + "/" ;
+					result = result + tempa + ")";
+					rsize = result.size();
+				}
+				else
+				{
+					char tempa[256];
+					//ostringstream temp;  //temp as in temporary
+					//temp<<nodes[maxindex].data;
+					itoa(nodes[maxindex].data,tempa,10);
+					string temps;
+					temps = temps + "(" + nodes[maxindex].label + "/";
+					temps = temps + tempa + ")";
+					rsize = temps.size();
+					result.insert(s.index,temps);
+				}
+				stackinput l;
+				l.start = s.start;
+				l.end = maxindex - 1;
+				l.index = s.index + 1;
+				stk.push(l);
+				stackinput r;
+				r.start = maxindex + 1;
+				r.end = s.end;
+				r.index = s.index + rsize - 1;
+				stk.push(r);
+				//cout<<result<<endl;
+			}
+			cout<<result<<endl;
+
+			scanf("%d",&n);
+		}
+	}
+
+};
 
 namespace hackerearth
 {
@@ -218,9 +331,362 @@ namespace hackerearth
 
 };
 
+namespace navigationnightmare
+{
+const int MAXN = 40000, MAXK = 10000;
+	struct link
+	{
+		int farma;
+		int farmb;
+		int length;
+		char dist;
+	}links[MAXN+1];
+	struct query
+	{
+		int farma;
+		int farmb;
+		int queryindex;
+		int distance;
+		int index;
+	}queries[MAXK+1];
+	class queryindexcomp
+	{
+	public:
+		bool operator()(query& a, query& b)
+		{
+			if(a.queryindex < b.queryindex)
+				return true;
+			else
+				return false;
+		}
+	};
+	class indexcomp
+	{
+	public:
+		bool operator()(query& a, query& b)
+		{
+			if(a.index < b.index)
+				return true;
+			else
+				return false;
+		}
+	};
+	struct point
+	{
+		int x;
+		int y;
+	}farms[MAXN+1];
+	void calculatePoint(point& a, point& b, int length, char dist)
+	{
+		b.x = a.x;
+		b.y = a.y;
+		switch(dist)
+		{
+		case 'N':
+			b.y += length;
+			break;
+		case 'S':
+			b.y = b.y - length;
+			break;
+		case 'W':
+			b.x = b.x - length;
+			break;
+		case 'E':
+			b.x += length;
+			break;
+		}
+	}
+	void calculateDistance(map<int,vector<link>>& farmmap, point* farms, int n, int index, bool* visited)
+	{
+		queue<int> que;
+		que.push(index);
+		while(!que.empty())
+		{
+			int ind = que.front();
+			que.pop();
+			visited[ind] = true;
+			for(int i = 0; i < farmmap[ind].size(); i++)
+			{
+				int nextind = farmmap[ind][i].farmb;
+				if(!visited[nextind])
+				{
+					calculatePoint(farms[ind],farms[nextind],farmmap[ind][i].length, farmmap[ind][i].dist);
+					que.push(nextind);
+				}
+			}
+		}
+	}
+	int calculateCoordDistance(point a, point b)
+	{
+		int dist = abs(a.x - b.x) + abs(a.y - b.y);
+		return dist;
+	}
+	char returnreversedist(char a)
+	{
+		switch(a)
+		{
+		case 'E':
+			return 'W';
+		case 'W':
+			return 'E';
+		case 'N':
+			return 'S';
+		default:
+			return 'N';
+		}
+	}
+	void navigation()
+	{
+		map<int,vector<link> > farmmap;
+		int n,m,k;
+		cin>>n>>m;
+		int* parent = new int[n+1];
+		//point* farms = new point[n+1];
+		bool * visited = new bool[n+1];
+		for(int i = 0; i < n+1; i++)
+		{
+			parent[i] = i;
+			visited[i] = false;
+		}
+		//link* links = new link[m];
+		for(int i = 0; i < m; i++)
+		{
+			int farma;
+			cin>>links[i].farma>>links[i].farmb>>links[i].length>>links[i].dist;
+			farma = links[i].farma;
+			if(farmmap.find(farma) != farmmap.end())
+			{
+				farmmap[farma].push_back(links[i]);
+			}
+			else
+			{
+				vector<link> temp;
+				farmmap[farma] = temp;
+				farmmap[farma].push_back(links[i]);
+			}
+			link temp;
+			temp.farma = links[i].farmb;
+			temp.farmb = links[i].farma;
+			temp.length = links[i].length;
+			temp.dist = returnreversedist(links[i].dist);
+			if(farmmap.find(temp.farma) != farmmap.end())
+			{
+				farmmap[temp.farma].push_back(temp);
+			}
+			else
+			{
+				vector<link> tempV;
+				farmmap[temp.farma] = tempV;
+				farmmap[temp.farma].push_back(temp);
+			}
+		}
+		farms[1].x = 0;
+		farms[1].y = 0;
+		calculateDistance(farmmap,farms,n+1,1, visited);
+		cin>>k;
+		//query* queries = new query[k];
+		for(int i = 0; i < k; i++)
+		{
+			cin>>queries[i].farma>>queries[i].farmb>>queries[i].queryindex;
+			queries[i].distance = -1;
+			queries[i].index = i;
+		}
+		// sort the queries according to queryindex
+		sort(queries,queries+k,queryindexcomp());
+		int process = 0;
+		for(int i = 0; i < k; i++)
+		{
+			int temp = queries[i].queryindex;
+			while(process < m && process < temp)
+			{
+				int rootb = links[process].farmb;
+				while(parent[rootb] != rootb)
+					rootb = parent[rootb];
+				int roota = links[process].farma;
+				while(parent[roota] != roota)
+					roota = parent[roota];
+				parent[roota] = rootb;
+				process++;
+			}
+			int roota = queries[i].farma,rootb = queries[i].farmb;
+			while(parent[roota] != roota)
+				roota = parent[roota];
+			while(parent[rootb] != rootb)
+				rootb = parent[rootb];
+			if(roota != rootb)
+				queries[i].distance = -1;
+			else
+				queries[i].distance = calculateCoordDistance(farms[queries[i].farma],farms[queries[i].farmb]);
+		}
+		sort(queries,queries+k,indexcomp());
+		for(int i = 0; i < k; i++)
+			cout<<queries[i].distance<<endl;
+	}
+}
+
+
+namespace expressions
+{
+	struct node
+	{
+		node* left, *right;
+		char val;
+	}_pool[10000];
+	// pool to avoid initialization costs at runtime
+	int _ptr = 0;
+	
+	void init(){_ptr = 0;}
+	
+	node* createNode(node* left, node* right, char a)
+	{
+		_pool[_ptr].left = left;
+		_pool[_ptr].right = right;
+		_pool[_ptr].val = a;
+		return &_pool[_ptr++];
+	}
+	bool islower(char a)
+	{
+		if(a >= 'a' && a <= 'z')
+			return true;
+		return false;
+	}
+	void evaluateExpression()
+	{
+		int tests;
+		cin>>tests;
+		while(tests--)
+		{
+			init();
+			string input;
+			cin>>input;
+			stack<node*> stk;
+			queue<node*> que;
+			// Create the expression tree
+			for(int i = 0; i < input.size(); i++)
+			{
+				if(islower(input[i]))
+				{
+					stk.push(createNode(NULL, NULL, input[i]));
+				}
+				else
+				{
+					node* left = stk.top();
+					stk.pop();
+					node* right = stk.top();
+					stk.pop();
+					stk.push(createNode(left,right,input[i]));
+				}
+			}
+			node* root = stk.top();
+			string ans;
+			// Level order traversal to get answer
+			que.push(root);
+			while(!que.empty())
+			{
+				node* temp = que.front();
+				que.pop();
+				ans += temp->val;
+				if(temp->right != NULL)
+					que.push(temp->right);
+				if(temp->left != NULL)
+					que.push(temp->left);
+			}
+			reverse(ans.begin(),ans.end());
+			cout<<ans<<endl;
+		}
+	}
+}
+
 namespace peking
 {
 	using namespace std;
+
+	void ncs()
+	{
+		int tests;
+		cin>>tests;
+		while(tests--)
+		{
+			map<int, int> parent;
+			int numNodes;
+			cin>>numNodes;
+			for(int i = 0; i <= numNodes; i++)
+				parent[i] = 0;
+			for(int i = 0; i < numNodes-1; i++)
+			{
+				int c, p;
+				cin>>p>>c;
+				parent[c]=p;
+			}
+			int nodea, nodeb;
+			cin>>nodea>>nodeb;
+			int counta=0,countb=0;
+			int tempa = nodea,tempb = nodeb;
+			while(tempa != 0)
+			{
+				counta++;
+				tempa = parent[tempa];
+			}
+			while(tempb != 0)
+			{
+				countb++;
+				tempb = parent[tempb];
+			}
+			tempa = nodea;
+			tempb = nodeb;
+			if(counta > countb)
+			{
+				while(counta > countb)
+				{
+					tempa = parent[tempa];
+					counta--;
+				}
+			}
+			else
+			{
+				while(countb > counta)
+				{
+					tempb = parent[tempb];
+					countb--;
+				}
+			}
+			while(countb != 0)
+			{
+				if(tempb == tempa)
+				{
+					cout<<tempb<<endl;
+					break;
+				}
+				tempb = parent[tempb];
+				tempa = parent[tempa];
+				countb--;
+			}
+		}
+	}
+
+	void hardwood()
+	{
+		map<string,int> hashmap;
+		string input;
+		long total = 0;
+		while(getline(cin,input))
+		{
+			//string input(inp);
+			if(input == "")
+				break;
+			total++;
+			if(hashmap.find(input) == hashmap.end())
+			{
+				hashmap[input] = 1;
+			}
+			else
+				hashmap[input] = hashmap[input] + 1;
+		}
+		for(map<string,int>::iterator it = hashmap.begin(); it!= hashmap.end(); it++)
+		{
+			printf("%s %.4f\n",it->first.c_str(),it->second*100/double(total));
+		}
+	}
 
 	int tempInversion()
 	{

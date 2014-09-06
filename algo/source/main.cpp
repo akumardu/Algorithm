@@ -309,7 +309,7 @@ void create_all_Pallindromes()
 
 int main()
 {
-	amazonprep::testprogram_1();
+	BinarySearchHeapConstruction::binarysearchheap();
 	
 	std::getchar();
 	std::getchar();
