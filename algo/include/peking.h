@@ -3,11 +3,242 @@
 #include<map>
 #include<iostream>
 #include<stdio.h>
+#include <cstdio>
 #include<iomanip>
 #include<stack>
 #include<queue>
 #include<limits.h>
 #include<sstream>
+
+namespace FindAndCatchThem
+{
+
+	using namespace std;
+
+	int N, M;
+	int Set[2 * 100005];
+
+	void Initial(int N);
+	int Find_Root(int x);
+	void SetEnemy(int x, int y);
+	void Union(int x, int y);
+	void Compare(int x, int y);
+
+	void main()
+	{
+		int Case, x, y;
+		char Mode;
+		scanf("%d", &Case);
+		while (Case--) {
+			scanf("%d %d", &N, &M);
+			Initial(N);
+			while (M--) {
+				scanf(" %c %d %d", &Mode, &x, &y);
+				if (Mode == 'A')
+					Compare(x, y);
+				else if (Mode == 'D')
+					SetEnemy(x, y);
+			}
+		}
+	}
+	void Initial(int N)
+	{
+		for (int i = 1; i <= N; ++i)
+			Set[i] = i, Set[i+N] = 0;
+	}
+	int Find_Root(int x)
+	{
+		if (x == Set[x])
+			return x;
+		return Set[x] = Find_Root(Set[x]);
+	}
+	void SetEnemy(int x, int y)
+	{
+		int x_enemy = Set[x+N];
+		int y_enemy = Set[y+N];
+
+		if (x_enemy == 0) Set[x+N] = Find_Root(y);
+		else Union(x_enemy, y);
+
+		if (y_enemy == 0) Set[y+N] = Find_Root(x);
+		else Union(y_enemy, x);
+
+	}
+	void Union(int x, int y)
+	{
+		x = Find_Root(x);
+		y = Find_Root(y);
+		if (x != y)
+			Set[y] = x;
+	}
+	void Compare(int x, int y)
+	{
+		int x_root = Find_Root(x);
+		int x_enemy = Find_Root(x+N);
+
+		int y_root = Find_Root(y);
+		int y_enemy = Find_Root(y+N);
+
+		if (x_root == y_root)
+			puts("In the same gang.");
+		else if (x_enemy == y_root || y_enemy == x_root)
+			puts("In different gangs.");
+		else
+			puts("Not sure yet.");
+	}
+}
+
+namespace CubeStacking
+{
+	using namespace std;
+#define MAX 30001
+	class unionfind
+	{
+	public:
+		unionfind(int numberOfElements)
+		{
+			size = numberOfElements;
+			/*ufds = new int[numberOfElements];
+			under = new int[numberOfElements];
+			child = new int[numberOfElements];*/
+			for(int i = 0; i < numberOfElements; i++)
+			{
+				ufds[i] = i;
+				under[i] = 1;
+				child[i] = i;
+			}
+		}
+		int findNumberOfTreesUnder(int index)
+		{
+			return under[index] - 1;
+		}
+		bool findIfOnSameTree(int index1, int index2)
+		{
+			while(index1 != ufds[index1])
+				index1 = ufds[index1];
+			while(index2 != ufds[index2])
+				index2 = ufds[index2];
+			return index1 == index2;
+		}
+		void unionTree(int index1, int index2)
+		{
+			int root1 = index1;
+			while(root1 != ufds[root1])
+				root1 = ufds[root1];
+			int root2 = index2;
+			while(root2 != ufds[root2])
+				root2 = ufds[root2];
+			ufds[root2] = root1;
+			int chd = root1;
+			while(chd != child[chd])
+			{
+				under[chd] += under[root2];
+				chd = child[chd];
+			}
+			under[chd] += under[root2];
+			child[chd] = root2;
+			while(index2 != root2)
+			{
+				int temp = ufds[index2];
+				ufds[index2] = root1;
+				index2 = temp;
+			}
+		}
+		~unionfind()
+		{
+			/*delete[] ufds;
+			delete[] under;
+			delete[] child;*/
+		}
+	private:
+		int ufds[MAX];
+		int under[MAX];
+		int child[MAX];
+		int size;
+	};
+
+	void cubestacker()
+	{
+		unionfind uf(MAX);
+		int tests = 0;
+		cin>>tests;
+		while(tests--)
+		{
+			char ch;
+			int from, to;
+			cin>>ch>>from;
+			switch(ch)
+			{
+			case 'M':
+				cin>>to;
+				uf.unionTree(from,to);
+				break;
+			case 'C':
+				cout<<uf.findNumberOfTreesUnder(from)<<endl;
+				break;
+			default:
+				cout<<"Problem"<<endl;
+			};
+		}
+	}
+}
+
+namespace CubeStacking2
+{
+	int father[30001], num[30001], under[30001];//father?num?under[i]i
+	int find(int x)
+	{
+		int item = father[x];//x
+		if(x != father[x])
+		{
+			father[x] = find(father[x]);//x
+			int temp = under[x];
+			int temp2 = under[item];
+			under[x] += under[item]; //Unionxunder[fx]?x
+		}
+		return father[x];
+	}
+	void Union(int x, int y)
+	{
+		int fx = find(x), fy = find(y);
+		if(fx == fy)
+			return;
+		father[fx] = fy;
+		under[fx] += num[fy];//?y?
+		num[fy] += num[fx];//y
+	}
+	int main2()
+	{
+		int i = 0, a = 0, b = 0, p = 0;
+		char ch = 0;
+		scanf("%d",&p);
+		getchar();
+		for(i = 1; i<30001; i++)
+		{
+			num[i] = 1;
+			under[i] = 0;
+			father[i] = i;
+		}
+		while(p--)
+		{
+			scanf("%c",&ch);
+			if(ch == 'M')
+			{
+				scanf("%d %d",&a,&b);
+				Union(a,b);
+			}
+			else
+			{
+				scanf("%d",&a);
+				find(a);
+				printf("%d\n",under[a]);
+			}
+			getchar();
+		}
+		return 0;
+	}
+
+}
 
 namespace BinarySearchHeapConstruction
 {

@@ -309,7 +309,7 @@ void create_all_Pallindromes()
 
 int main()
 {
-	BinarySearchHeapConstruction::binarysearchheap();
+	CubeStacking2::main2();
 	
 	std::getchar();
 	std::getchar();
